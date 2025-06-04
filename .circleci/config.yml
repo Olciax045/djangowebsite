@@ -18,6 +18,9 @@ jobs:
 
     steps:
       - checkout
+	  python/install-packages:
+          pkg-manager: pipenv
+
 
       - python/load-cache
 
