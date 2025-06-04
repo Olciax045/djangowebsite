@@ -16,7 +16,7 @@ jobs:
           POSTGRES_DB: circle_test
           POSTGRES_PASSWORD: circle_test
 
-    steps:
+        steps:
       - checkout
 
       - python/install-packages:
@@ -30,13 +30,21 @@ jobs:
             pipenv run python manage.py migrate
 
       - run:
-          name: Uruchomienie testów
+          name: Uruchomienie testów i zapis do XML
           command: |
-            pipenv run python manage.py test
+            mkdir -p test-results
+            pipenv run python manage.py test --testrunner=xmlrunner.extra.djangotestrunner.XMLTestRunner --output-file=test-results/results.xml
+
+      - store_test_results:
+          path: test-results
 
       - python/save-cache
+
 
 workflows:
   on_commit:
     jobs:
       - build_and_test
+
+unittest-xml-reporting
+
