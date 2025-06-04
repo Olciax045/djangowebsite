@@ -16,29 +16,35 @@ jobs:
           POSTGRES_DB: circle_test
           POSTGRES_PASSWORD: circle_test
 
-        steps:
+               steps:
       - checkout
-
-      - python/install-packages:
-          pkg-manager: pipenv
-
       - python/load-cache
+
+      - run:
+          name: Utworzenie i aktywacja środowiska wirtualnego + instalacja zależności
+          command: |
+            python -m venv venv
+            . venv/bin/activate
+            pip install --upgrade pip
+            pip install -r requirements.txt
 
       - run:
           name: Migracje bazy danych
           command: |
-            pipenv run python manage.py migrate
+            . venv/bin/activate
+            python manage.py migrate
 
       - run:
-          name: Uruchomienie testów i zapis do XML
+          name: Uruchomienie testów i zapis do test-reports/
           command: |
-            mkdir -p test-results
-            pipenv run python manage.py test --testrunner=xmlrunner.extra.djangotestrunner.XMLTestRunner --output-file=test-results/results.xml
+            . venv/bin/activate
+            python -m xmlrunner discover -s . -o test-reports
 
       - store_test_results:
-          path: test-results
+          path: test-reports
 
       - python/save-cache
+
 
 
 workflows:
