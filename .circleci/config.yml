@@ -16,7 +16,7 @@ jobs:
           POSTGRES_DB: circle_test
           POSTGRES_PASSWORD: circle_test
 
-               steps:
+    steps:
       - checkout
       - python/load-cache
 
@@ -43,23 +43,23 @@ jobs:
       - store_test_results:
           path: test-reports
 
-      - run:
-    name: Podsumowanie testów
-    command: |
-      PASSED=$(grep -o 'tests="[^"]*"' test-reports/*.xml | grep -o '[0-9]\+')
-      echo "Great Job: $PASSED tests are passing"
+      - store_artifacts:
+          path: test-reports
+          destination: test-results
 
+      - run:
+          name: Podsumowanie testów
+          command: |
+            if ls test-reports/*.xml 1> /dev/null 2>&1; then
+              PASSED=$(grep -o 'tests="[^"]*"' test-reports/*.xml | grep -o '[0-9]\+' | head -n 1)
+              echo "Great Job: $PASSED tests are passing"
+            else
+              echo "⚠️ Nie znaleziono plików XML z wynikami testów."
+            fi
 
       - python/save-cache
-	
-
-
-
 
 workflows:
   on_commit:
     jobs:
       - build_and_test
-
-unittest-xml-reporting
-
