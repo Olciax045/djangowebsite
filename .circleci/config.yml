@@ -9,8 +9,8 @@ jobs:
       - image: cimg/python:3.10.1
         environment:
           DJANGO_SETTINGS_MODULE: locallibrary.settings
-          DATABASE_URL: postgres://postgres:password@localhost:5432/mylibrary
-      - image: cimg/postgres:9.6.2
+          DATABASE_URL: postgres://root:circle_test@localhost:5432/circle_test
+      - image: circleci/postgres:9.6.2
         environment:
           POSTGRES_USER: root
           POSTGRES_DB: circle_test
@@ -18,31 +18,21 @@ jobs:
 
     steps:
       - checkout
-	  python/install-packages:
-          pkg-manager: pipenv
 
+      - python/install-packages:
+          pkg-manager: pipenv
 
       - python/load-cache
 
       - run:
-          name: Utworzenie i aktywacja środowiska wirtualnego + instalacja zależności
-          command: |
-            python -m venv venv
-            . venv/bin/activate
-            pip install --upgrade pip
-            pip install -r requirements.txt
-
-      - run:
           name: Migracje bazy danych
           command: |
-            . venv/bin/activate
-            python manage.py migrate
+            pipenv run python manage.py migrate
 
       - run:
           name: Uruchomienie testów
           command: |
-            . venv/bin/activate
-            python manage.py test
+            pipenv run python manage.py test
 
       - python/save-cache
 
