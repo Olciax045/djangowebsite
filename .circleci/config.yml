@@ -43,6 +43,12 @@ jobs:
       - store_test_results:
           path: test-reports
 
+      - run:
+          name: Podsumowanie testów
+          command: |
+            PASSED=$(grep -o 'tests="[^"]*"' test-reports/*.xml | grep -o '[0-9]\+')
+            echo "Great Job: $PASSED tests are passing"
+
       - python/save-cache
 
 
