@@ -1,22 +1,47 @@
 version: 2.1
+
 orbs:
   python: circleci/python@1.5.0
+
 jobs:
   build_and_test:
     docker:
-      - image: <obraz_pythona>
+      - image: cimg/python:3.10
         environment:
-          ..... 
-      - image: <obraz_postgresa>
-        environment:          
-          POSTGRES_USER: <POSTGRES_USER>
-          POSTGRES_DB: <POSTGRES_DB>
+          DJANGO_SETTINGS_MODULE: locallibrary.settings
+          DATABASE_URL: postgres://postgres:password@localhost:5432/mylibrary
+      - image: cimg/postgres:14.3
+        environment:
+          POSTGRES_USER: postgres
+          POSTGRES_DB: mylibrary
+          POSTGRES_PASSWORD: password
+
     steps:
       - checkout
-      ....
-      ....
-      ....
-      ....
+
+      - python/load-cache
+
+      - run:
+          name: Utworzenie i aktywacja środowiska wirtualnego + instalacja zależności
+          command: |
+            python -m venv venv
+            . venv/bin/activate
+            pip install --upgrade pip
+            pip install -r requirements.txt
+
+      - run:
+          name: Migracje bazy danych
+          command: |
+            . venv/bin/activate
+            python manage.py migrate
+
+      - run:
+          name: Uruchomienie testów
+          command: |
+            . venv/bin/activate
+            python manage.py test
+
+      - python/save-cache
 
 workflows:
   on_commit:
