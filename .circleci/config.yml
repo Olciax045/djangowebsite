@@ -56,6 +56,12 @@ jobs:
               echo "⚠️ Nie znaleziono plików XML z wynikami testów."
             fi
 
+      - persist_to_workspace:
+          root: .
+          paths:
+            - test-reports
+            - venv
+
 workflows:
   on_commit:
     jobs:
