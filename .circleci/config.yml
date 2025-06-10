@@ -60,5 +60,3 @@ workflows:
   on_commit:
     jobs:
       - build_and_test
-
-xmlrunner==1.7.7
