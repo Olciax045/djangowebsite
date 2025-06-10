@@ -6,25 +6,34 @@ orbs:
 jobs:
   build_and_test:
     docker:
-      - image: cimg/python:3.10.1  # Zadanie 2
-      - image: circleci/postgres:9.6.2  # Zadanie 3
+      - image: cimg/python:3.10.1
+        environment:
+          DJANGO_SETTINGS_MODULE: locallibrary.settings
+          DATABASE_URL: postgres://root:circle_test@localhost:5432/circle_test
+      - image: circleci/postgres:9.6.2
         environment:
           POSTGRES_USER: root
           POSTGRES_DB: circle_test
+          POSTGRES_PASSWORD: circle_test
+
     steps:
-      - checkout  # Zadanie 4
+      - checkout
 
       - python/install-packages:
-          pkg-manager: pipenv  # Zadanie 4
+          pkg-manager: pip
+          args: -r requirements.txt
 
-      - run:  # Zadanie 5
-          name: Run tests
-          command: pipenv run python manage.py test  # lub python -m pytest – zależy od projektu
+      - run:
+          name: Run Django tests and output to test-results
+          command: |
+            mkdir -p test-results
+            python manage.py test --testrunner=xmlrunner.extra.djangotestrunner.XMLTestRunner --output-dir test-results
 
-      - store_test_results:  # Zadanie 6
-          path: test-results  # upewnij się, że testy zapisują wyniki tutaj, np. przez pytest z --junitxml
+      - store_test_results:
+          path: test-results
 
 workflows:
+  version: 2
   on_commit:
     jobs:
       - build_and_test
