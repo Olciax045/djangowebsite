@@ -46,6 +46,12 @@ jobs:
           path: test-reports
           destination: test-results
 
+      - persist_to_workspace:
+    root: .
+    paths:
+      - test-results
+
+
       - run:
           name: Podsumowanie testów
           command: |
