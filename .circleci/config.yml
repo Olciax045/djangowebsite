@@ -46,12 +46,8 @@ jobs:
           path: test-reports
           destination: test-results
 
-      - persist_to_workspace:
-          root: .
-          paths:
-            - test-results
-
-workflows:
-  on_commit:
-    jobs:
-      - build_and_test
+      - run:
+          name: Podsumowanie testów
+          command: |
+            if ls test-reports/*.xml 1> /dev/null 2>&1; then
+              PASSED=$(grep -o 'tests="[^"]*"' test-reports/*.xml | grep -o '[0-9]\+' | head -n 1
