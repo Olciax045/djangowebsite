@@ -47,20 +47,9 @@ jobs:
           destination: test-results
 
       - persist_to_workspace:
-    root: .
-    paths:
-      - test-results
-
-
-      - run:
-          name: Podsumowanie testów
-          command: |
-            if ls test-reports/*.xml 1> /dev/null 2>&1; then
-              PASSED=$(grep -o 'tests="[^"]*"' test-reports/*.xml | grep -o '[0-9]\+' | head -n 1)
-              echo "Great Job: $PASSED tests are passing"
-            else
-              echo "⚠️ Nie znaleziono plików XML z wynikami testów."
-            fi
+          root: .
+          paths:
+            - test-results
 
 workflows:
   on_commit:
