@@ -50,4 +50,20 @@ jobs:
           name: Podsumowanie testów
           command: |
             if ls test-reports/*.xml 1> /dev/null 2>&1; then
-              PASSED=$(grep -o 'tests="[^"]*"' test-reports/*.xml | grep -o '[0-9]\+' | head -n 1
+              PASSED=$(grep -o 'tests="[^"]*"' test-reports/*.xml | grep -o '[0-9]\+' | head -n 1)
+              echo "Liczba testów: $PASSED"
+            else
+              echo "Brak wyników testów"
+            fi
+
+workflows:
+  version: 2
+  test_and_build:
+    jobs:
+      - build_and_test:
+          filters:
+            paths:
+              only:
+                - "src/**"
+                - "manage.py"
+                - "requirements.txt"
